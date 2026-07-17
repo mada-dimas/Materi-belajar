@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buku Monitor Hafalan — LTQ Aulia Cendekia</title>
+<style>
+  :root{
+    --hijau-tua: #14532d;
+    --hijau: #1f7a3d;
+    --hijau-muda: #e7f3ea;
+    --emas: #b8860b;
+    --emas-terang: #d4af37;
+    --abu: #64748b;
+    --garis: #d8e3da;
+    --merah: #b91c1c;
+    --bg: #f6f8f5;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color:#1e2a22;
+  }
+  header.top{
+    background: linear-gradient(135deg, var(--hijau-tua), var(--hijau) 70%);
+    color:#fff;
+    padding:18px 16px 16px;
+    position:sticky; top:0; z-index:30;
+    box-shadow:0 2px 10px rgba(0,0,0,0.15);
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand-icon{
+    width:44px;height:44px;border-radius:10px;
+    background:rgba(255,255,255,0.15);
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px; flex-shrink:0;
+    border:1px solid rgba(212,175,55,0.6);
+  }
+  .brand h1{font-size:15px; margin:0; letter-spacing:0.3px; font-weight:700;}
+  .brand p{font-size:11px; margin:2px 0 0; opacity:0.85;}
+  .tabs{
+    display:flex; gap:6px; margin-top:14px; overflow-x:auto; padding-bottom:2px;
+    scrollbar-width: thin;
+  }
+  .tab-btn{
+    flex:0 0 auto;
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.25);
+    color:#fff; padding:8px 14px; border-radius:8px;
+    font-size:12.5px; font-weight:600; cursor:pointer;
+    white-space:nowrap;
+  }
+  .tab-btn.active{
+    background: var(--emas-terang); color:#14320a; border-color:var(--emas-terang);
+  }
+  .view-toggle{
+    display:flex; gap:6px; margin-top:10px;
+  }
+  .view-btn{
+    flex:1; background:rgba(0,0,0,0.18); border:1px solid rgba(255,255,255,0.25);
+    color:#fff; padding:7px 10px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer;
+  }
+  .view-btn.active{ background:#fff; color:var(--hijau-tua); }
+  .controls{
+    background:#fff; border-bottom:1px solid var(--garis);
+    padding:10px 12px; display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+    position:sticky; top:158px; z-index:20;
+  }
+  .controls label{font-size:11px; color:var(--abu); display:block; margin-bottom:2px;}
+  .controls select, .controls input[type=date]{
+    font-size:13px; padding:6px 8px; border:1px solid var(--garis); border-radius:6px;
+    background:#fbfdfb;
+  }
+  .week-label{font-size:12px; color:var(--hijau-tua); font-weight:700;}
+  .save-status{margin-left:auto; font-size:11.5px; color:var(--abu); display:flex; align-items:center; gap:6px;}
+  .dot{width:7px;height:7px;border-radius:50%;background:#9ca3af;}
+  .dot.ok{background:#22c55e;}
+  .dot.busy{background:#f59e0b;}
+  .dot.err{background:#dc2626;}
+  .retry-btn{
+    display:none; background:var(--merah); color:#fff; border:none; border-radius:6px;
+    padding:4px 8px; font-size:11px; cursor:pointer; font-weight:700;
+  }
+  .retry-btn.show{display:inline-block;}
+
+  .info-box{
+    margin:10px 12px 0; background:#fffbea; border:1px solid #f1e3a8;
+    border-radius:8px; padding:8px 12px; font-size:11.5px; color:#5a4a10; line-height:1.5;
+  }
+  .info-box b{color:#7a5c00;}
+  .error-banner{
+    margin:10px 12px 0; background:#fef2f2; border:1px solid #fca5a5; color:#991b1b;
+    border-radius:8px; padding:8px 12px; font-size:12px; display:none; align-items:center; gap:10px; justify-content:space-between;
+  }
+  .error-banner.show{display:flex;}
+
+  .content{padding:10px 8px 40px;}
+  .group-title{font-size:13.5px; font-weight:700; color:var(--hijau-tua); margin:8px 4px 6px;}
+  .muhaffidz-block{margin-bottom:14px;}
+  .muhaffidz-header{
+    font-size:12px; font-weight:700; color:#fff; background:var(--hijau);
+    padding:6px 10px; border-radius:6px 6px 0 0; display:flex; justify-content:space-between; align-items:center;
+  }
+  .table-wrap{overflow-x:auto; border:1px solid var(--garis); border-radius:0 0 8px 8px; background:#fff;}
+  table{border-collapse:collapse; width:100%; font-size:11.5px;}
+  th, td{border:1px solid var(--garis); padding:4px; text-align:center;}
+  th{background:var(--hijau-muda); color:#183a24; font-weight:700; font-size:10.5px; position:sticky; top:0;}
+  td.nama{text-align:left; white-space:nowrap; font-weight:600; padding-left:8px; background:#fcfefc; position:sticky; left:0;}
+  td.kelas{font-weight:600; color:var(--hijau-tua); width:30px;}
+  td.baseline{font-size:10.5px; color:var(--abu); white-space:nowrap; max-width:110px;}
+  .group-head-day{background:#eef7f0;}
+  .group-head-day.zi{background:#fdf3e3;}
+  input.cell{
+    width:62px; border:1px solid #dfe7e1; border-radius:4px; padding:4px 3px;
+    font-size:11px; text-align:center; background:#fff;
+  }
+  input.cell:focus{outline:2px solid var(--emas-terang); border-color:var(--emas);}
+  input.cell.dirty{background:#fff8e1;}
+  input.cell.failed{background:#fee2e2; border-color:#f87171;}
+  .col-hdr-group{background:var(--hijau); color:#fff; font-size:10.5px;}
+  .col-hdr-group.zi{background:var(--emas);}
+  .legend{
+    display:flex; gap:14px; flex-wrap:wrap; font-size:11px; color:var(--abu); margin:14px 12px 0;
+  }
+  .legend span{display:flex; align-items:center; gap:5px;}
+  .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+  .empty-note{padding:20px; text-align:center; color:var(--abu); font-size:12.5px;}
+  ::-webkit-scrollbar{height:8px; width:8px;}
+  ::-webkit-scrollbar-thumb{background:#c3d3c8; border-radius:4px;}
+
+  /* Recap view */
+  .recap-toolbar{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:10px 12px;}
+  .btn{
+    background:var(--hijau); color:#fff; border:none; border-radius:7px; padding:8px 12px;
+    font-size:12px; font-weight:700; cursor:pointer;
+  }
+  .btn.secondary{background:#fff; color:var(--hijau-tua); border:1px solid var(--hijau);}
+  .recap-summary{
+    display:flex; gap:10px; flex-wrap:wrap; margin:0 12px 10px;
+  }
+  .stat-card{
+    background:#fff; border:1px solid var(--garis); border-radius:8px; padding:8px 12px; min-width:110px;
+  }
+  .stat-card .num{font-size:18px; font-weight:800; color:var(--hijau-tua);}
+  .stat-card .lbl{font-size:10.5px; color:var(--abu);}
+  .prog-wrap{background:#eef2ee; border-radius:5px; height:6px; overflow:hidden; margin-top:3px;}
+  .prog-bar{height:100%; background:var(--hijau);}
+  .recap-table td.count{font-weight:700;}
+  .recap-table td.count.full{color:#15803d;}
+  .recap-table td.count.partial{color:#b45309;}
+  .recap-table td.count.zero{color:#94a3b8;}
+  .recap-table td.detail{text-align:left; font-size:10.5px; color:#374151; max-width:220px;}
+  textarea#copyArea{position:absolute; left:-9999px; top:-9999px;}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <div class="brand-icon">📖</div>
+    <div>
+      <h1>BUKU MONITOR HAFALAN — LTQ AULIA CENDEKIA</h1>
+      <p>Program Tahsin–Tahfidz Al'Qur'an · Tahun Ajaran 2026/2027 · Santri Putra</p>
+    </div>
+  </div>
+  <div class="tabs" id="tabs"></div>
+  <div class="view-toggle">
+    <button class="view-btn active" id="btnViewInput">📝 Input Harian</button>
+    <button class="view-btn" id="btnViewRecap">📊 Rekap Mingguan</button>
+  </div>
+</header>
+
+<div class="controls">
+  <div>
+    <label>Kelompok / Muhaffidz</label>
+    <select id="muhaffidzFilter"></select>
+  </div>
+  <div>
+    <label>Pilih tanggal (dalam minggu berjalan)</label>
+    <input type="date" id="weekPicker">
+  </div>
+  <div class="week-label" id="weekLabel"></div>
+  <div class="save-status">
+    <span class="dot" id="saveDot"></span><span id="saveText">Tersimpan</span>
+    <button class="retry-btn" id="retryBtn">Coba lagi</button>
+  </div>
+</div>
+
+<div class="error-banner" id="errorBanner">
+  <span id="errorText"></span>
+  <button class="retry-btn show" id="errorRetryBtn" style="position:static;">Coba lagi</button>
+</div>
+
+<div class="error-banner" id="modeBanner" style="background:#fff7ed;border-color:#fdba74;color:#9a3412;">
+  <span>⚠️ <b>Mode tanpa penyimpanan bersama.</b> Data yang diketik hanya tersimpan sementara di tampilan ini dan <b>tidak</b> akan terlihat oleh guru lain atau tersimpan setelah ditutup. Ini biasanya terjadi karena file dibuka langsung (diunduh/dobel klik) — buka kembali lewat jendela Artifact di Claude (jangan file yang diunduh) supaya data tersimpan otomatis dan bisa dibagikan ke ~30 pengguna.</span>
+</div>
+
+<div class="info-box" id="inputInfo">
+  <b>Alur setoran (sesuai Pedoman Kurikulum):</b> Murojaah hafalan lama → <b>Binnadhor</b> (baca sambil melihat mushaf, bagian yang akan dihafal) → setor <b>Hafalan Baru / Ziyadah</b>. Tidak ada setoran ziyadah tanpa binnadhor & murojaah terlebih dahulu. Isi kolom sesuai capaian harian Senin–Sabtu (mis. "Al-Baqarah 1‑5", "✓ lancar", atau catatan singkat). Data tersimpan otomatis — titik hijau di kanan atas menandakan data sudah tersimpan.
+</div>
+
+<div class="recap-toolbar" id="recapToolbar" style="display:none;">
+  <button class="btn" id="copyRecapBtn">📋 Salin Rekap (untuk laporan/WA)</button>
+  <span style="font-size:11px;color:var(--abu);">Rekap mengikuti kelompok/muhaffidz & minggu yang dipilih di atas</span>
+</div>
+
+<div class="content" id="content"></div>
+
+<div class="legend" id="legendInput">
+  <span><span class="sw" style="background:var(--hijau)"></span> Binnadhor (baca lihat mushaf)</span>
+  <span><span class="sw" style="background:var(--emas)"></span> Hafalan Baru (ziyadah)</span>
+</div>
+
+<textarea id="copyArea" readonly></textarea>
+
+<script>
+const DAYS = ["Sen","Sel","Rab","Kam","Jum","Sab"];
+const DAY_FULL = ["Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+
+// ---------- DATA SANTRI ----------
+const GROUPS = [
+  {
+    key: "g1",
+    title: "Kelas 7 & 10 — Tahsin/Mengaji",
+    baselineLabel: "Tahap",
+    students: [
+      ["Algani Rosidi","7","Ust. Dimas Wahyudi, S.Ag","Tahsin"],
+      ["Adinata Nugraha","7","Ust. Dimas Wahyudi, S.Ag","Tahsin"],
+      ["Abdul Qodir Jailani","7","Ust. Dimas Wahyudi, S.Ag","Tahsin"],
+      ["M. Iqbal Alaska","7","Ust. Dimas Wahyudi, S.Ag","Tahsin"],
+      ["Muhammad Lutfi","7","Ust. Dimas Wahyudi, S.Ag","Tahsin"],
+      ["Muhammad Akbar","7","Ust. Dimas Wahyudi, S.Ag","Tahsin"],
+      ["Muhammad Hisyam Wiratama","7","Ust. Dimas Wahyudi, S.Ag","Tahsin"],
+      ["Muhammd Fadlan","7","Ust. Dimas Wahyudi, S.Ag","Tahsin"],
+      ["Wahyu Sukma Daya","7","Ust. Dimas Wahyudi, S.Ag","Tahsin"],
+      ["Muhammad Mustakiman","7","Ust. M. Yusuf Alfaridzi","Tahsin"],
+      ["Dito Milan Permadi","7","Ust. M. Yusuf Alfaridzi","Tahsin"],
+      ["Al Adnan Pashter","7","Ust. M. Yusuf Alfaridzi","Tahsin"],
+      ["Al Hafizd Akbar","7","Ust. M. Yusuf Alfaridzi","Tahsin"],
+      ["Arjen Robben Suryadi","7","Ust. M. Yusuf Alfaridzi","Tahsin"],
+      ["Alwi Kurniawan","7","Ust. M. Yusuf Alfaridzi","Tahsin"],
+      ["M. Alfariz Anggara Putra","8","Ust. M. Yusuf Alfaridzi","Tahsin"],
+      ["Muhammad Gurun Azhari","7","Ust. M. Yusuf Alfaridzi","Tahsin"],
+      ["M. Reihan Dwi Anugrah","7","Ust. M. Yusuf Alfaridzi","Tahsin"],
+      ["Muhammad Rafatri Raditya","7","Ust. Rahman Gisda","Tahsin"],
+      ["M. Fadil Raditiyansyah","7","Ust. Rahman Gisda","Tahsin"],
+      ["Iqbal Khairy","7","Ust. Rahman Gisda","Tahsin"],
+      ["Muhammad Khoirul Arzaki","7","Ust. Rahman Gisda","Tahsin"],
+      ["Ahmad Syarif Fawwazi","7","Ust. Rahman Gisda","Tahsin"],
+      ["Farid Atallah","7","Ust. Rahman Gisda","Tahsin"],
+      ["Muhammad Ramzi","7","Ust. Rahman Gisda","Tahsin"],
+      ["Bachtiar Yunan Habibi","7","Ust. Rahman Gisda","Tahsin"],
+      ["M. Iqbal","10","Ust. Musyadat","Tahsin"],
+      ["M. Rifki","10","Ust. Musyadat","Tahsin"],
+      ["Alwi Fatir Abdillah","10","Ust. Musyadat","Tahsin"],
+      ["Merando","10","Ust. Musyadat","Tahsin"],
+      ["M. Arif Fadillah","10","Ust. Musyadat","Tahsin"],
+      ["M. Iqbal (2)","10","Ust. Musyadat","Tahsin"],
+      ["M. Elvin Tri Putra","10","Ust. Musyadat","Tahsin"],
+      ["Rafael Ananda","10","Ust. Musyadat","Tahsin"],
+      ["Wally Ortega","10","Ust. Musyadat","Tahsin"],
+      ["Abdul Rizky","10","Ust. Musyadat","Tahsin"]
+    ]
+  },
+  {
+    key: "g2",
+    title: "Kelas 8 & 11 — Hafalan & Mengaji",
+    baselineLabel: "Hafalan Terakhir",
+    students: [
+      ["Edho Pratama","8","Ust. Achmad Fauzi, M.Ag","Tahsin"],
+      ["Langit Rivano","8","Ust. Achmad Fauzi, M.Ag","Tahsin"],
+      ["M. Ilham Julian Ramadhan","8","Ust. Achmad Fauzi, M.Ag","Iqro' 6 Hal 3"],
+      ["Naufal Erda Pratama","8","Ust. Achmad Fauzi, M.Ag","Iqro' 6 Hal 3"],
+      ["Rahmat Hidayat","8","Ust. Achmad Fauzi, M.Ag","Iqro' Hal 14"],
+      ["Victor Aldyansyah","8","Ust. Achmad Fauzi, M.Ag","Abasa"],
+      ["Muhammad Aditya","8","Ust. Zikril Hakim","An-Naziat"],
+      ["Taufik Wijaya","8","Ust. Zikril Hakim","An-Naziat"],
+      ["Nasrowi","8","Ust. Zikril Hakim","An-Naziat"],
+      ["Basok Rahman","8","Ust. Zikril Hakim","Abasa"],
+      ["Hafizh Destyano","8","Ust. Zikril Hakim","Al-Muthoffifin"],
+      ["Dimas","8","Ust. Zikril Hakim","Abasa"],
+      ["M. Albar Abyansyah","8","Ust. Zikril Hakim","An-Naziat"],
+      ["Icandy Arnitra","11","Ust. Hizam Fikri Aditama","Tahsin"],
+      ["M. Rizki Anugrah","11","Ust. Hizam Fikri Aditama","Iqro' 6 Hal 22"],
+      ["Alfranza Pranata","11","Ust. Hizam Fikri Aditama","Tahsin"],
+      ["M. Siroz Annazif","11","Ust. Hizam Fikri Aditama","Tahsin"],
+      ["Fadhil","11","Ust. Hizam Fikri Aditama","Muroja'ah Juz 1"],
+      ["M. Febrion","11","Ust. Hizam Fikri Aditama","Juz 2 Hal 2"]
+    ]
+  },
+  {
+    key: "g3",
+    title: "Kelas 9 & 12 — Hafalan",
+    baselineLabel: "Hafalan Terakhir",
+    students: [
+      ["Rifansyah Pratama","9","Ust. Muhammad Al-Davi","Iqro' 5 Hal 28"],
+      ["M. Ilham Pratama","9","Ust. Muhammad Al-Davi","Al-Buruj"],
+      ["Muhammad Afandi","9","Ust. Muhammad Al-Davi","Abasa"],
+      ["Tofik Maulana","9","Ust. Muhammad Al-Davi","Asy-Syarh"],
+      ["Muhamad Ilham Bintang","9","Ust. Muhammad Al-Davi","Muroja'ah Juz 30"],
+      ["M. Zaid Antoni","9","Ust. Muhammad Al-Davi","Iqro' 6 Hal 30"],
+      ["Muhammad Hafiz Desfarizal","9","Kh. Saiful Wardi","At-Takwir"],
+      ["Muhammad Farrel R S","9","Kh. Saiful Wardi","Al-Balad"],
+      ["Asri Khairul Azam","9","Kh. Saiful Wardi","Juz 1 Hal 6"],
+      ["Ilham Pratama","9","Kh. Saiful Wardi","Al-Buruj"],
+      ["Deni Anggara","9","Kh. Saiful Wardi","Juz 1 Hal 6"],
+      ["Aldo Pratama Hidayat","12","Ust. Fajar Nugroho, S.Ag","Juz 2 Hal 4"],
+      ["Fadlan Jayadinata","12","Ust. Fajar Nugroho, S.Ag","Juz 2 Hal 11"],
+      ["Fitru Rizaludin","12","Ust. Fajar Nugroho, S.Ag","Juz 2 Hal 9"],
+      ["Ismed Abdullah","12","Ust. Fajar Nugroho, S.Ag","Juz 1 Hal 9"],
+      ["Muhammad Akbar","12","Ust. Fajar Nugroho, S.Ag","Juz 1 Hal 17"],
+      ["Tegar Merciano","12","Ust. Fajar Nugroho, S.Ag","Juz 3 Hal 6"],
+      ["M. Azandi Akbar","12","Ust. Rezki Imam Mutaqi, S.Ag","Juz 2 Hal 6"],
+      ["M. Arif Alfa Rizqie","12","Ust. Rezki Imam Mutaqi, S.Ag","Juz 30 Selesai"],
+      ["Abdal Al-Rasyid","12","Ust. Rezki Imam Mutaqi, S.Ag","Al-Alaq"],
+      ["M. Ibrahimovic","12","Ust. Rezki Imam Mutaqi, S.Ag","Juz 1 Hal 9"],
+      ["Mahdi Pungkas Wijaksono","12","Ust. Rezki Imam Mutaqi, S.Ag","Juz 30 Selesai"]
+    ]
+  },
+  {
+    key: "g4",
+    title: "Tahfidz Khusus",
+    baselineLabel: "Hafalan Terakhir",
+    students: [
+      ["Riko Wibisono","9","Ust. Azis Putra Pratama","Juz 1 Hal 20"],
+      ["Syahdan Alfaris","9","Ust. Azis Putra Pratama","Juz 1 Hal 13"],
+      ["Muhammad Galang Pranata","9","Ust. Azis Putra Pratama","Juz 1 Hal 20"],
+      ["Ridwan Hanafi","9","Ust. Azis Putra Pratama","Juz 2 Hal 9"],
+      ["Anisyar Agil Fadillah","9","Ust. Azis Putra Pratama","Juz 1 Hal 8"],
+      ["Ridho Saputra","9","Ust. Azis Putra Pratama","Juz 1 Hal 6"],
+      ["Aldian Bernandes","9","Ust. Azis Putra Pratama","Juz 1 Hal 5"],
+      ["Muhammad Irfan Arsyad","8","Ust. Azis Putra Pratama","Al-Insyiqoq"],
+      ["Muhammad Idlan","9","Ust. Rahmat Siregar, S.Ag","Juz 3 Hal 10"],
+      ["Danish Marzuki","9","Ust. Rahmat Siregar, S.Ag","Juz 4 Hal 8"],
+      ["Ambo Fajri Herdiansyah","9","Ust. Rahmat Siregar, S.Ag","Muroja'ah Juz 2"],
+      ["Muhammad Nizzam","8","Ust. Rahmat Siregar, S.Ag","Abasa"],
+      ["Muhammad Galang Al Arsyan","8","Ust. Rahmat Siregar, S.Ag","At-Thoriq"],
+      ["Muhammad Fikri Al Mubaraq","8","Ust. Rahmat Siregar, S.Ag","Juz 1 Hal 10"],
+      ["Muhammad Hafidz Syakur","8","Ust. Rahmat Siregar, S.Ag","Juz 1 Hal 4"],
+      ["M. Fahry Ali Sya'ban","11","Ust. Rahmat Siregar, S.Ag","Juz 2 Hal 2"],
+      ["M. Yusril Septiansyah","9","Ust. Ricky Syahputra, S.Ag","Juz 1 Hal 12"],
+      ["M. Zafran Alvaro","9","Ust. Ricky Syahputra, S.Ag","Juz 1 Hal 12"],
+      ["Alfin Faza","9","Ust. Ricky Syahputra, S.Ag","Juz 3 Hal 13"],
+      ["Muhammad Diki Saputra","9","Ust. Ricky Syahputra, S.Ag","Juz 3 Hal 16"],
+      ["Muhammad Yoda Al-Faqih","9","Ust. Ricky Syahputra, S.Ag","Juz 3 Hal 2"],
+      ["Ravasyah Wafiq Ramadhan","9","Ust. Ricky Syahputra, S.Ag","Juz 2 Hal 10"],
+      ["Akbar Safwan Nibras","9","Ust. Ricky Syahputra, S.Ag","Juz 2 Hal 9"]
+    ]
+  }
+];
+
+GROUPS.forEach(g=>{
+  g.students = g.students.map((s,i)=>({
+    id: g.key+"-"+i, nama:s[0], kelas:s[1], muhaffidz:s[2], baseline:s[3]
+  }));
+});
+
+let activeGroup = GROUPS[0].key;
+let activeView = "input"; // "input" | "recap"
+let currentEntries = {}; // { studentId: {b:[6], z:[6]} }
+let saveTimer = null;
+let loadToken = 0;
+let failedKeys = new Set();      // keys that failed to save, for manual retry
+let lastSaveContext = null;      // {wk, muhaffidzList} for retry button
+
+// storageMode: "checking" | "ok" | "unavailable"
+// "unavailable" happens when this file is opened as a plain downloaded HTML file
+// (double-clicked, file://, saved to disk) instead of being viewed inside Claude's
+// artifact panel. window.storage is an API Claude injects only in that panel, so
+// outside of it every save will fail — this is the #1 real-world cause of
+// "gagal menyimpan" happening on every keystroke.
+let storageMode = "checking";
+const memStore = new Map(); // in-memory fallback so the app stays usable even without persistence
+
+// ---------- helpers ----------
+function mondayOf(dateStr){
+  const d = new Date(dateStr+"T00:00:00");
+  const day = d.getDay();
+  const diff = (day===0? -6 : 1-day);
+  d.setDate(d.getDate()+diff);
+  return d;
+}
+function fmt(d){
+  return d.toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"});
+}
+function weekKeyFromMonday(d){
+  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,"0"), day=String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+function todayStr(){
+  const d=new Date();
+  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,"0"), day=String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+function esc(s){ return (s||"").toString().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+// ---------- robust storage wrapper ----------
+async function withRetry(fn, retries=3, baseDelay=350){
+  let lastErr;
+  for(let i=0;i<retries;i++){
+    try{
+      return await fn();
+    }catch(e){
+      lastErr = e;
+      if(i < retries-1){
+        await new Promise(r=>setTimeout(r, baseDelay*(i+1)));
+      }
+    }
+  }
+  throw lastErr;
+}
+
+async function detectStorage(){
+  if(typeof window.storage === "undefined" || typeof window.storage.set !== "function"){
+    storageMode = "unavailable";
+    showPersistentModeBanner();
+    return;
+  }
+  try{
+    // real round-trip check, not just presence of the object
+    await window.storage.set("__healthcheck__", String(Date.now()), false);
+    storageMode = "ok";
+  }catch(e){
+    storageMode = "unavailable";
+    showPersistentModeBanner();
+  }
+}
+
+function showPersistentModeBanner(){
+  const el = document.getElementById("modeBanner");
+  if(el) el.classList.add("show");
+}
+
+async function safeGet(key, shared){
+  if(storageMode==="unavailable"){
+    const v = memStore.get(shared+"::"+key);
+    return v!==undefined ? {key, value:v, shared} : null;
+  }
+  try{
+    return await withRetry(()=>window.storage.get(key, shared), 2, 300);
+  }catch(e){
+    // key genuinely not found also throws from storage.get — treat as "no data yet"
+    return null;
+  }
+}
+
+async function safeSet(key, value, shared){
+  if(storageMode==="unavailable"){
+    memStore.set(shared+"::"+key, value);
+    return {key, value, shared};
+  }
+  return withRetry(()=>window.storage.set(key, value, shared), 3, 400);
+}
+
+function showErrorBanner(msg, onRetry){
+  const banner=document.getElementById("errorBanner");
+  document.getElementById("errorText").textContent = msg;
+  banner.classList.add("show");
+  const btn=document.getElementById("errorRetryBtn");
+  btn.onclick = async ()=>{
+    banner.classList.remove("show");
+    if(onRetry) await onRetry();
+  };
+}
+function hideErrorBanner(){
+  document.getElementById("errorBanner").classList.remove("show");
+}
+
+function setSaveStatus(state){
+  const dot=document.getElementById("saveDot"), txt=document.getElementById("saveText");
+  const retryBtn=document.getElementById("retryBtn");
+  retryBtn.classList.remove("show");
+  if(state==="busy"){dot.className="dot busy"; txt.textContent="Menyimpan...";}
+  else if(state==="ok"){dot.className="dot ok"; txt.textContent="Tersimpan";}
+  else if(state==="err"){
+    dot.className="dot err"; txt.textContent="Gagal menyimpan";
+    retryBtn.classList.add("show");
+  }
+  else{dot.className="dot"; txt.textContent="Memuat...";}
+}
+
+// ---------- tabs & view toggle ----------
+function renderTabs(){
+  const tabs=document.getElementById("tabs");
+  tabs.innerHTML="";
+  GROUPS.forEach(g=>{
+    const b=document.createElement("button");
+    b.className="tab-btn"+(g.key===activeGroup?" active":"");
+    b.textContent=g.title.split("—")[0].trim();
+    b.onclick=()=>{ activeGroup=g.key; refreshMuhaffidzFilter(); loadAndRender(); };
+    tabs.appendChild(b);
+  });
+}
+function currentGroup(){ return GROUPS.find(g=>g.key===activeGroup); }
+
+function setView(view){
+  activeView = view;
+  document.getElementById("btnViewInput").classList.toggle("active", view==="input");
+  document.getElementById("btnViewRecap").classList.toggle("active", view==="recap");
+  document.getElementById("inputInfo").style.display = view==="input" ? "block":"none";
+  document.getElementById("legendInput").style.display = view==="input" ? "flex":"none";
+  document.getElementById("recapToolbar").style.display = view==="recap" ? "flex":"none";
+  loadAndRender();
+}
+document.getElementById("btnViewInput").onclick = ()=> setView("input");
+document.getElementById("btnViewRecap").onclick = ()=> setView("recap");
+
+function refreshMuhaffidzFilter(){
+  const sel=document.getElementById("muhaffidzFilter");
+  const g=currentGroup();
+  const names=[...new Set(g.students.map(s=>s.muhaffidz))];
+  sel.innerHTML = `<option value="__all__">Semua kelompok (${g.students.length} santri)</option>` +
+    names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join("");
+  safeGet("pref:muhaffidz:"+g.key, false).then(r=>{
+    if(r && names.includes(r.value)) sel.value=r.value;
+  });
+}
+
+// ---------- load & render ----------
+async function loadAndRender(){
+  const myToken = ++loadToken;
+  setSaveStatus("loading");
+  hideErrorBanner();
+  const g=currentGroup();
+  const dateVal = document.getElementById("weekPicker").value || todayStr();
+  const monday = mondayOf(dateVal);
+  const sunday = new Date(monday); sunday.setDate(sunday.getDate()+5);
+  document.getElementById("weekLabel").textContent = `Minggu: ${fmt(monday)} — ${fmt(sunday)}`;
+  const wk = weekKeyFromMonday(monday);
+
+  const sel = document.getElementById("muhaffidzFilter").value || "__all__";
+  const muhaffidzList = sel==="__all__" ? [...new Set(g.students.map(s=>s.muhaffidz))] : [sel];
+
+  currentEntries = {};
+  let hadError = false;
+  for(const m of muhaffidzList){
+    const key = `entries:${g.key}:${encodeURIComponent(m)}:${wk}`;
+    const res = await safeGet(key, true);
+    if(myToken!==loadToken) return;
+    if(res && res.value){
+      try{
+        const parsed = JSON.parse(res.value);
+        Object.assign(currentEntries, parsed);
+      }catch(e){ hadError = true; }
+    }
+  }
+  if(myToken!==loadToken) return;
+
+  if(activeView==="input"){
+    renderTable(wk, sel, muhaffidzList);
+  }else{
+    renderRecap(wk, muhaffidzList);
+  }
+  setSaveStatus(hadError ? "err" : "ok");
+  if(hadError){
+    showErrorBanner("Sebagian data minggu ini gagal dimuat. Coba muat ulang.", loadAndRender);
+  }
+}
+
+// ---------- INPUT VIEW ----------
+function renderTable(wk, sel, muhaffidzList){
+  const g=currentGroup();
+  const content=document.getElementById("content");
+  content.innerHTML="";
+
+  const groupsByM = {};
+  g.students.forEach(s=>{
+    if(sel!=="__all__" && s.muhaffidz!==sel) return;
+    (groupsByM[s.muhaffidz] = groupsByM[s.muhaffidz]||[]).push(s);
+  });
+
+  if(Object.keys(groupsByM).length===0){
+    content.innerHTML = `<div class="empty-note">Tidak ada santri pada kelompok ini.</div>`;
+    return;
+  }
+
+  Object.entries(groupsByM).forEach(([muh, students])=>{
+    const block=document.createElement("div");
+    block.className="muhaffidz-block";
+    block.innerHTML = `<div class="muhaffidz-header"><span>${esc(muh)}</span><span>${students.length} santri</span></div>`;
+
+    const wrap=document.createElement("div");
+    wrap.className="table-wrap";
+    const table=document.createElement("table");
+
+    const thead=document.createElement("thead");
+    thead.innerHTML = `
+      <tr>
+        <th rowspan="2">No</th>
+        <th rowspan="2">Nama Santri</th>
+        <th rowspan="2">Kelas</th>
+        <th rowspan="2">${esc(g.baselineLabel)}</th>
+        <th colspan="6" class="col-hdr-group">Binnadhor (baca lihat mushaf)</th>
+        <th colspan="6" class="col-hdr-group zi">Hafalan Baru (Ziyadah)</th>
+      </tr>
+      <tr>
+        ${DAYS.map(d=>`<th class="group-head-day">${d}</th>`).join("")}
+        ${DAYS.map(d=>`<th class="group-head-day zi">${d}</th>`).join("")}
+      </tr>`;
+    table.appendChild(thead);
+
+    const tbody=document.createElement("tbody");
+    students.forEach((s,idx)=>{
+      const tr=document.createElement("tr");
+      const entry = currentEntries[s.id] || {b:["","","","","",""], z:["","","","","",""]};
+      let row = `<td>${idx+1}</td><td class="nama">${esc(s.nama)}</td><td class="kelas">${esc(s.kelas)}</td><td class="baseline">${esc(s.baseline||"-")}</td>`;
+      for(let i=0;i<6;i++){
+        row += `<td><input class="cell" data-sid="${s.id}" data-type="b" data-idx="${i}" value="${esc(entry.b[i])}"></td>`;
+      }
+      for(let i=0;i<6;i++){
+        row += `<td><input class="cell" data-sid="${s.id}" data-type="z" data-idx="${i}" value="${esc(entry.z[i])}"></td>`;
+      }
+      tr.innerHTML=row;
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    wrap.appendChild(table);
+    block.appendChild(wrap);
+    content.appendChild(block);
+  });
+
+  content.querySelectorAll("input.cell").forEach(inp=>{
+    inp.addEventListener("input", e=>{
+      const {sid, type, idx} = e.target.dataset;
+      if(!currentEntries[sid]) currentEntries[sid] = {b:["","","","","",""], z:["","","","","",""]};
+      currentEntries[sid][type][idx] = e.target.value;
+      e.target.classList.add("dirty");
+      e.target.classList.remove("failed");
+      scheduleSave(wk, muhaffidzList);
+    });
+  });
+
+  document.getElementById("retryBtn").onclick = ()=>{
+    if(lastSaveContext) doSave(lastSaveContext.wk, lastSaveContext.muhaffidzList);
+  };
+}
+
+function scheduleSave(wk, muhaffidzList){
+  setSaveStatus("busy");
+  lastSaveContext = {wk, muhaffidzList};
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(()=> doSave(wk, muhaffidzList), 700);
+}
+
+async function doSave(wk, muhaffidzList){
+  const g=currentGroup();
+  const failedThisRound = [];
+  for(const m of muhaffidzList){
+    const ids = g.students.filter(s=>s.muhaffidz===m).map(s=>s.id);
+    const payload = {};
+    ids.forEach(id=>{ if(currentEntries[id]) payload[id]=currentEntries[id]; });
+    const key = `entries:${g.key}:${encodeURIComponent(m)}:${wk}`;
+    try{
+      await safeSet(key, JSON.stringify(payload), true);
+      failedKeys.delete(key);
+    }catch(e){
+      failedKeys.add(key);
+      failedThisRound.push(m);
+    }
+  }
+  if(failedThisRound.length>0){
+    setSaveStatus("err");
+    showErrorBanner(
+      `Gagal menyimpan data untuk: ${failedThisRound.join(", ")}. Perubahan tetap ada di layar — klik "Coba lagi" untuk menyimpan ulang.`,
+      ()=> doSave(wk, muhaffidzList)
+    );
+    document.querySelectorAll("input.cell").forEach(inp=>{
+      const sid = inp.dataset.sid;
+      const s = g.students.find(x=>x.id===sid);
+      if(s && failedThisRound.includes(s.muhaffidz)) inp.classList.add("failed");
+    });
+  }else{
+    setSaveStatus("ok");
+    document.querySelectorAll("input.cell.dirty, input.cell.failed").forEach(inp=>{
+      inp.classList.remove("dirty"); inp.classList.remove("failed");
+    });
+  }
+}
+
+// ---------- RECAP VIEW ----------
+function countFilled(arr){ return arr.filter(v=>v && v.trim()!=="").length; }
+
+function renderRecap(wk, muhaffidzList){
+  const g=currentGroup();
+  const content=document.getElementById("content");
+  content.innerHTML="";
+
+  const sel = document.getElementById("muhaffidzFilter").value || "__all__";
+  const groupsByM = {};
+  g.students.forEach(s=>{
+    if(sel!=="__all__" && s.muhaffidz!==sel) return;
+    (groupsByM[s.muhaffidz] = groupsByM[s.muhaffidz]||[]).push(s);
+  });
+
+  if(Object.keys(groupsByM).length===0){
+    content.innerHTML = `<div class="empty-note">Tidak ada santri pada kelompok ini.</div>`;
+    return;
+  }
+
+  // overall stats
+  let totalSantri=0, totalBinnadhorSlot=0, totalBinnadhorFilled=0, totalZiyadahSlot=0, totalZiyadahFilled=0;
+
+  Object.entries(groupsByM).forEach(([muh, students])=>{
+    const block=document.createElement("div");
+    block.className="muhaffidz-block";
+    block.innerHTML = `<div class="muhaffidz-header"><span>${esc(muh)}</span><span>${students.length} santri</span></div>`;
+
+    const wrap=document.createElement("div");
+    wrap.className="table-wrap";
+    const table=document.createElement("table");
+    table.className="recap-table";
+    table.innerHTML = `<thead><tr>
+        <th>No</th><th>Nama</th><th>Kelas</th><th>${esc(g.baselineLabel)}</th>
+        <th>Binnadhor</th><th>Ziyadah</th><th>Ringkasan Ziyadah Minggu Ini</th>
+      </tr></thead>`;
+    const tbody=document.createElement("tbody");
+
+    students.forEach((s,idx)=>{
+      totalSantri++;
+      const entry = currentEntries[s.id] || {b:["","","","","",""], z:["","","","","",""]};
+      const bCount = countFilled(entry.b), zCount = countFilled(entry.z);
+      totalBinnadhorSlot+=6; totalBinnadhorFilled+=bCount;
+      totalZiyadahSlot+=6; totalZiyadahFilled+=zCount;
+
+      const bClass = bCount===6?"full":(bCount===0?"zero":"partial");
+      const zClass = zCount===6?"full":(zCount===0?"zero":"partial");
+
+      const ringkasan = entry.z.map((v,i)=> v && v.trim() ? `${DAYS[i]}: ${esc(v)}` : null).filter(Boolean).join(" · ") || "—";
+
+      const tr=document.createElement("tr");
+      tr.innerHTML = `
+        <td>${idx+1}</td>
+        <td class="nama">${esc(s.nama)}</td>
+        <td class="kelas">${esc(s.kelas)}</td>
+        <td class="baseline">${esc(s.baseline||"-")}</td>
+        <td class="count ${bClass}">${bCount}/6</td>
+        <td class="count ${zClass}">${zCount}/6</td>
+        <td class="detail">${ringkasan}</td>`;
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    wrap.appendChild(table);
+    block.appendChild(wrap);
+    content.appendChild(block);
+  });
+
+  // summary cards at top of content
+  const pctB = totalBinnadhorSlot ? Math.round(100*totalBinnadhorFilled/totalBinnadhorSlot) : 0;
+  const pctZ = totalZiyadahSlot ? Math.round(100*totalZiyadahFilled/totalZiyadahSlot) : 0;
+  const summary = document.createElement("div");
+  summary.className="recap-summary";
+  summary.innerHTML = `
+    <div class="stat-card"><div class="num">${totalSantri}</div><div class="lbl">Santri terpantau</div></div>
+    <div class="stat-card"><div class="num">${pctB}%</div><div class="lbl">Binnadhor terisi</div>
+      <div class="prog-wrap"><div class="prog-bar" style="width:${pctB}%"></div></div></div>
+    <div class="stat-card"><div class="num">${pctZ}%</div><div class="lbl">Ziyadah terisi</div>
+      <div class="prog-wrap"><div class="prog-bar" style="width:${pctZ}%"></div></div></div>`;
+  content.insertBefore(summary, content.firstChild);
+}
+
+// ---------- Salin rekap untuk WhatsApp ----------
+function buildRecapText(){
+  const g=currentGroup();
+  const dateVal = document.getElementById("weekPicker").value || todayStr();
+  const monday = mondayOf(dateVal);
+  const sunday = new Date(monday); sunday.setDate(sunday.getDate()+5);
+  const sel = document.getElementById("muhaffidzFilter").value || "__all__";
+
+  let lines = [];
+  lines.push(`*REKAP MINGGUAN — ${g.title}*`);
+  lines.push(`LTQ Aulia Cendekia | Minggu: ${fmt(monday)} – ${fmt(sunday)}`);
+  lines.push("");
+
+  const groupsByM = {};
+  g.students.forEach(s=>{
+    if(sel!=="__all__" && s.muhaffidz!==sel) return;
+    (groupsByM[s.muhaffidz] = groupsByM[s.muhaffidz]||[]).push(s);
+  });
+
+  Object.entries(groupsByM).forEach(([muh, students])=>{
+    lines.push(`*${muh}*`);
+    students.forEach((s,idx)=>{
+      const entry = currentEntries[s.id] || {b:["","","","","",""], z:["","","","","",""]};
+      const bCount = countFilled(entry.b), zCount = countFilled(entry.z);
+      lines.push(`${idx+1}. ${s.nama} (Kls ${s.kelas}) — Binnadhor ${bCount}/6, Ziyadah ${zCount}/6`);
+      const zText = entry.z.map((v,i)=> v && v.trim() ? `${DAYS[i]}:${v}` : null).filter(Boolean).join("; ");
+      if(zText) lines.push(`   Ziyadah: ${zText}`);
+    });
+    lines.push("");
+  });
+
+  return lines.join("\n");
+}
+
+document.getElementById("copyRecapBtn").onclick = async ()=>{
+  const text = buildRecapText();
+  const area = document.getElementById("copyArea");
+  try{
+    await navigator.clipboard.writeText(text);
+    alert("Rekap berhasil disalin. Silakan tempel (paste) ke WhatsApp atau laporan.");
+  }catch(e){
+    area.value = text;
+    area.style.position="fixed"; area.style.left="10px"; area.style.top="10px";
+    area.style.width="90%"; area.style.height="200px"; area.style.zIndex=999;
+    area.focus(); area.select();
+    try{
+      document.execCommand("copy");
+      alert("Rekap berhasil disalin.");
+    }catch(e2){
+      alert("Tidak bisa menyalin otomatis. Teks rekap ditampilkan di kotak — silakan salin manual.");
+    }
+    area.style.position="absolute"; area.style.left="-9999px"; area.style.top="-9999px";
+  }
+};
+
+// ---------- events ----------
+document.getElementById("weekPicker").addEventListener("change", loadAndRender);
+document.getElementById("muhaffidzFilter").addEventListener("change", ()=>{
+  const g=currentGroup();
+  const sel=document.getElementById("muhaffidzFilter").value;
+  safeSet("pref:muhaffidz:"+g.key, sel, false).catch(()=>{});
+  loadAndRender();
+});
+
+document.getElementById("weekPicker").value = todayStr();
+renderTabs();
+detectStorage().then(()=>{
+  refreshMuhaffidzFilter();
+  loadAndRender();
+});
+</script>
+</body>
+</html>
